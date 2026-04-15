@@ -3,15 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal de Acesso - Montserrat</title>
+    <title>Tela de Acesso | MindSpace</title>
+    
+    <link rel="icon" href="https://i.ibb.co/1YvDJ3VQ/MindSpace-Isotipo.png" type="image/png">
     
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600&display=swap" rel="stylesheet">
 
     <style>
         /* DOCUMENTAÇÃO CSS:
-           - Reset de margens para o detalhe superior colar no topo.
-           - Flexbox para centralização perfeita.
-           - Cores extraídas diretamente do Modelo 3.jpeg.
+           - Reset global.
+           - Estilização da barra superior e botões circulares.
         */
         * {
             margin: 0;
@@ -28,18 +29,18 @@
             min-height: 100vh;
         }
 
-        /* DETALHE SUPERIOR DA PÁGINA */
+        /* DETALHE SUPERIOR */
         .header-decor {
             width: 100%;
-            margin-bottom: 100px;
+            margin-bottom: 80px;
         }
         .line-top {
             height: 18px;
-            background-color: #1a4fa0; /* Azul Escuro do Modelo */
+            background-color: #1a4fa0;
         }
         .line-bottom {
             height: 8px;
-            background-color: #6d8db4; /* Azul Claro do Modelo */
+            background-color: #6d8db4;
             margin-top: 6px;
         }
 
@@ -49,6 +50,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            padding: 20px;
         }
 
         h1 {
@@ -61,16 +63,19 @@
 
         .options-group {
             display: flex;
-            gap: 120px; /* Espaçamento entre os círculos */
+            gap: 120px;
             justify-content: center;
             flex-wrap: wrap;
         }
 
+        /* Links de opção */
         .option-item {
             display: flex;
             flex-direction: column;
             align-items: center;
-            text-decoration: none;
+            text-decoration: none; /* Remove o sublinhado do link */
+            color: inherit; /* Mantém a cor do texto preta */
+            transition: transform 0.3s ease;
         }
 
         /* BOTÕES CIRCULARES */
@@ -78,42 +83,44 @@
             width: 240px;
             height: 240px;
             border-radius: 50%;
-            border: none;
             display: flex;
             justify-content: center;
             align-items: center;
-            cursor: pointer;
             margin-bottom: 25px;
             transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.3s ease;
             box-shadow: 0 10px 30px rgba(0,0,0,0.08);
         }
 
-        .circle:hover {
-            transform: scale(1.08);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
-        }
-
-        /* Cores específicas dos botões */
+        /* Cores dos círculos */
         .bg-aluno { background-color: #1a4fa0; }
         .bg-prof { background-color: #6d8db4; }
 
-        /* ÍCONES (Imagens do Icons8 em Branco) */
+        /* Ícones brancos */
         .circle img {
             width: 60%;
             height: auto;
             object-fit: contain;
-            /* Filtro para garantir que fiquem brancos caso mude a fonte */
             filter: brightness(0) invert(1); 
         }
 
-        /* TEXTO ABAIXO DO CÍRCULO */
+        /* Texto abaixo */
         .label {
             font-size: 2rem;
             color: #333;
             font-weight: 400;
         }
 
-        /* Responsividade básica para celular */
+        /* Efeito ao passar o mouse em todo o conjunto (círculo + texto) */
+        .option-item:hover .circle {
+            transform: scale(1.08);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+        }
+
+        .option-item:active .circle {
+            transform: scale(0.95);
+        }
+
+        /* Responsividade */
         @media (max-width: 600px) {
             .options-group { gap: 40px; }
             .circle { width: 180px; height: 180px; }
@@ -133,19 +140,19 @@
 
         <div class="options-group">
             
-            <div class="option-item">
-                <button class="circle bg-aluno">
-                    <img src="https://img.icons8.com/ios-filled/200/ffffff/graduation-cap.png" alt="Ícone Aluno">
-                </button>
+            <a href="https://mindspaceeducacao.github.io/MindSpace/Portal-do-Aluno" class="option-item">
+                <div class="circle bg-aluno">
+                    <img src="https://img.icons8.com/ios-filled/200/ffffff/graduation-cap.png" alt="Portal do Aluno">
+                </div>
                 <span class="label">Aluno</span>
-            </div>
+            </a>
 
-            <div class="option-item">
-                <button class="circle bg-prof">
-                    <img src="https://img.icons8.com/ios-filled/200/ffffff/teacher.png" alt="Ícone Professor">
-                </button>
+            <a href="https://mindspaceeducacao.github.io/MindSpace/Portal-do-Educador" class="option-item">
+                <div class="circle bg-prof">
+                    <img src="https://img.icons8.com/ios-filled/200/ffffff/teacher.png" alt="Portal do Educador">
+                </div>
                 <span class="label">Professor</span>
-            </div>
+            </a>
 
         </div>
     </main>
