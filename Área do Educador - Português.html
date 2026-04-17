@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Área do Educador</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
+        body { background-color: #ffffff; min-height: 200vh; display: flex; flex-direction: column; align-items: center; position: relative; padding-bottom: 150px; }
+        .bg-pattern { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background-image: linear-gradient(135deg, #4461f2 10%, #7a91f5 10%, #7a91f5 15%, #b2c0f9 15%, #b2c0f9 20%, transparent 20%), linear-gradient(135deg, transparent 80%, #b2c0f9 80%, #b2c0f9 85%, #7a91f5 85%, #7a91f5 90%, #4461f2 90%); opacity: 0.5; }
+        
+        .welcome-section { text-align: center; margin: 100px 0; animation: fadeInUp 0.8s ease-out; }
+        .welcome-section h1 { font-size: 3rem; color: #333; }
+        
+        .status-container { width: 90%; max-width: 850px; background: white; padding: 60px; border-radius: 50px; box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15), 0 15px 25px rgba(0, 0, 0, 0.1); display: flex; align-items: center; justify-content: space-around; margin-bottom: 80px; animation: fadeInUp 1s ease-out; }
+        .circle-progress { width: 150px; height: 150px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; background: #eee; transition: 0.8s; }
+        .circle-progress::before { content: ""; position: absolute; width: 115px; height: 115px; background: white; border-radius: 50%; }
+        .circle-progress span { position: relative; font-size: 2rem; font-weight: 800; color: #5d70f9; }
+        
+        .media-display-box { text-align: center; padding: 20px; border-left: 2px solid #eee; }
+        .media-valor { font-size: 3.5rem; font-weight: 800; color: #5d70f9; display: block; }
+        .media-label { font-size: 0.9rem; text-transform: uppercase; color: #999; font-weight: 700; letter-spacing: 1px; }
+        
+        .menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 40px; width: 90%; max-width: 850px; margin-bottom: 80px; }
+        .menu-card { background-color: #5d70f9; color: white; padding: 70px 30px; border-radius: 45px; text-decoration: none; display: flex; flex-direction: column; align-items: center; gap: 25px; box-shadow: 0 20px 40px rgba(93, 112, 249, 0.4); transition: 0.3s; }
+        .menu-card:hover { transform: translateY(-15px); }
+        .menu-card i { font-size: 4.5rem; }
+        .menu-card span { font-weight: 700; font-size: 1.3rem; text-transform: uppercase; }
+
+        /* NOVA SEÇÃO DE AGENDA NO DASHBOARD */
+        .agenda-preview { width: 90%; max-width: 850px; margin-bottom: 80px; background: #f0f3ff; padding: 40px; border-radius: 40px; }
+        .agenda-preview h2 { margin-bottom: 25px; color: #333; display: flex; align-items: center; gap: 15px; }
+        .task-list-dash { list-style: none; }
+        .task-item-dash { background: white; padding: 20px; border-radius: 20px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .task-date-tag { background: #5d70f9; color: white; padding: 5px 15px; border-radius: 10px; font-weight: 700; font-size: 0.8rem; }
+
+        .activities-section { width: 90%; max-width: 850px; padding-bottom: 100px; }
+        .activities-section h2 { margin-bottom: 50px; font-size: 2.2rem; color: #333; text-align: center; }
+        .activity-item { background: white; margin-bottom: 30px; padding: 40px; border-radius: 35px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12); }
+        .nota-final-tag { font-weight: 800; color: #5d70f9; font-size: 1.8rem; }
+        .status-tag { font-size: 1rem; font-weight: 600; }
+        
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+    <div class="bg-pattern"></div>
+    <header class="welcome-section">
+        <h1 id="saudacao">Olá, Educador!</h1>
+        <p id="data-atual" style="color: #5d70f9; font-weight: 600; margin-top: 15px; font-size: 1.3rem;"></p>
+    </header>
+
+    <section class="status-container">
+        <div class="progress-box">
+            <div class="circle-progress" id="grafico">
+                <span id="porcentagem-texto">0%</span>
+            </div>
+            <p style="font-weight: 700; color: #333; margin-top: 25px; text-align: center; font-size: 1.1rem;">Progresso Online</p>
+        </div>
+        <div class="media-display-box">
+            <span class="media-valor" id="media-total-dash">0.0</span>
+            <span class="media-label">Média Final de Língua Portuguesa</span>
+        </div>
+    </section>
+
+    <nav class="menu-grid">
+        <a href="Médias do Aluno.html" class="menu-card"><i class="fas fa-chart-line"></i><span>Médias</span></a>
+        <a href="#" class="menu-card"><i class="fas fa-file-signature"></i><span>Gabaritos</span></a>
+        <a href="#" class="menu-card"><i class="fas fa-book-open"></i><span>Livro Digital</span></a>
+        <a href="Agenda.html" class="menu-card"><i class="fas fa-calendar-alt"></i><span>Agenda</span></a>
+    </nav>
+
+    <section class="agenda-preview">
+        <h2><i class="fas fa-tasks" style="color: #5d70f9;"></i> Próximos Deveres</h2>
+        <div id="lista-tarefas-dash" class="task-list-dash">
+            <p style="color: #999;">Carregando compromissos...</p>
+        </div>
+    </section>
+
+    <section class="activities-section">
+        <h2>Detalhamento de Notas</h2>
+        <div class="activity-item"><div><p style="font-weight: 700; font-size: 1.4rem;">Atividade 1</p><small class="status-tag" id="status-n1">Pendente</small></div><p class="nota-final-tag" id="val-n1">---</p></div>
+        <div class="activity-item"><div><p style="font-weight: 700; font-size: 1.4rem;">Atividade 2</p><small class="status-tag" id="status-n2">Pendente</small></div><p class="nota-final-tag" id="val-n2">---</p></div>
+        <div class="activity-item"><div><p style="font-weight: 700; font-size: 1.4rem;">Atividade 3</p><small class="status-tag" id="status-n3">Pendente</small></div><p class="nota-final-tag" id="val-n3">---</p></div>
+        <div class="activity-item"><div><p style="font-weight: 700; font-size: 1.4rem;" id="label-outros">Outros</p><small class="status-tag" id="status-n_outros">Pendente</small></div><p class="nota-final-tag" id="val-n_outros">---</p></div>
+        <div class="activity-item"><div><p style="font-weight: 700; font-size: 1.4rem; color: #5d70f9;">Avaliação (Prova)</p><small class="status-tag" id="status-n_prova">Pendente</small></div><p class="nota-final-tag" id="val-n_prova" style="color: #333;">---</p></div>
+    </section>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAs3OTqOeVVzcxlrcM8Th5ObkhtXca69Ac",
+            authDomain: "mindspace-educacao.firebaseapp.com",
+            projectId: "mindspace-educacao",
+            storageBucket: "mindspace-educacao.firebasestorage.app",
+            messagingSenderId: "569394609531",
+            appId: "1:569394609531:web:9ab5ba6bc2181bc5a911de",
+            databaseURL: "https://mindspace-educacao-default-rtdb.firebaseio.com/"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        
+        // Referências
+        const dbRef = ref(db, 'dl/pt');
+        const agendaRef = ref(db, 'dl/apt');
+
+        const keys = ['n1', 'n2', 'n3', 'n_outros', 'n_prova'];
+
+        // LÓGICA DAS NOTAS
+        onValue(dbRef, (snapshot) => {
+            const data = snapshot.val();
+            let preenchidos = 0;
+            let somaTotal = 0;
+
+            if (data) {
+                keys.forEach(key => {
+                    const valor = data[key];
+                    if (valor !== undefined && valor !== "") {
+                        preenchidos++;
+                        somaTotal += parseFloat(valor) || 0;
+                        document.getElementById('val-' + key).innerText = valor;
+                        const st = document.getElementById('status-' + key);
+                        st.innerText = "Lançado"; st.style.color = "#27ae60";
+                    }
+                });
+                if (data.titulo_outros) document.getElementById('label-outros').innerText = data.titulo_outros;
+            }
+
+            const progresso = preenchidos * 20;
+            document.getElementById('porcentagem-texto').innerText = progresso + "%";
+            document.getElementById('grafico').style.background = `conic-gradient(#5d70f9 ${progresso}%, #eee 0)`;
+            document.getElementById('media-total-dash').innerText = somaTotal.toFixed(1);
+        });
+
+        // LÓGICA DA AGENDA (Preview no Dashboard)
+        onValue(agendaRef, (snapshot) => {
+            const tarefas = snapshot.val();
+            const container = document.getElementById('lista-tarefas-dash');
+            container.innerHTML = '';
+
+            if (tarefas) {
+                // Filtramos e ordenamos as tarefas para mostrar apenas as que têm conteúdo
+                const entries = Object.entries(tarefas).filter(([data, texto]) => texto.trim() !== "");
+                
+                if (entries.length === 0) {
+                    container.innerHTML = '<p style="color: #999;">Nenhum dever pendente.</p>';
+                } else {
+                    entries.forEach(([dataCompleta, texto]) => {
+                        // Formata a data de YYYY-MM-DD para DD/MM
+                        const partes = dataCompleta.split('-');
+                        const dataFormatada = `${partes[2]}/${partes[1]}`;
+
+                        const item = document.createElement('div');
+                        item.className = 'task-item-dash';
+                        item.innerHTML = `
+                            <span style="font-weight: 600; color: #444;">${texto}</span>
+                            <span class="task-date-tag">${dataFormatada}</span>
+                        `;
+                        container.appendChild(item);
+                    });
+                }
+            } else {
+                container.innerHTML = '<p style="color: #999;">Nenhum dever pendente.</p>';
+            }
+        });
+
+        // Data e Saudação
+        const agora = new Date();
+        const hora = agora.getHours();
+        const saudacao = document.getElementById('saudacao');
+        if (hora < 12) saudacao.innerText = "Bom dia, Daniel Lucca!";
+        else if (hora < 18) saudacao.innerText = "Boa tarde, Daniel Lucca!";
+        else saudacao.innerText = "Boa noite, Daniel Lucca!";
+        document.getElementById('data-atual').innerText = agora.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
+    </script>
+</body>
+</html>

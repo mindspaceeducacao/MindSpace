@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agenda</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
+        body { background-color: #ffffff; min-height: 100vh; display: flex; flex-direction: column; align-items: center; position: relative; padding-bottom: 50px; }
+        .bg-pattern { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background-image: linear-gradient(135deg, #4461f2 10%, #7a91f5 10%, #7a91f5 15%, #b2c0f9 15%, #b2c0f9 20%, transparent 20%), linear-gradient(135deg, transparent 80%, #b2c0f9 80%, #b2c0f9 85%, #7a91f5 85%, #7a91f5 90%, #4461f2 90%); opacity: 0.5; }
+        
+        .header-area { text-align: center; margin: 40px 0; }
+        .header-area h1 { font-size: 2.5rem; color: #333; }
+
+        .calendar-container { width: 95%; max-width: 800px; background: white; padding: 30px; border-radius: 40px; box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15); animation: fadeIn 0.8s ease-out; }
+        .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; color: #5d70f9; font-weight: 700; font-size: 1.5rem; }
+        
+        .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; text-align: center; }
+        .day-label { font-weight: 700; color: #bbb; font-size: 0.8rem; text-transform: uppercase; padding-bottom: 10px; }
+        .day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; border-radius: 15px; cursor: pointer; transition: 0.3s; font-weight: 600; color: #444; position: relative; border: 2px solid transparent; }
+        .day:hover { background: #f0f3ff; color: #5d70f9; }
+        .day.today { background: #5d70f9; color: white; box-shadow: 0 10px 20px rgba(93, 112, 249, 0.4); }
+        .day.has-task::after { content: ''; position: absolute; bottom: 5px; width: 5px; height: 5px; background: #27ae60; border-radius: 50%; }
+
+        /* Modal de Tarefas */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); align-items: center; justify-content: center; z-index: 100; }
+        .modal-content { background: white; padding: 40px; border-radius: 30px; width: 90%; max-width: 400px; text-align: center; }
+        .modal-content h3 { margin-bottom: 20px; color: #333; }
+        textarea { width: 100%; height: 100px; border-radius: 15px; border: 2px solid #eee; padding: 15px; outline: none; margin-bottom: 20px; resize: none; font-size: 1rem; }
+        .btn-save { background: #5d70f9; color: white; border: none; padding: 12px 30px; border-radius: 15px; cursor: pointer; font-weight: 700; width: 100%; }
+
+        .btn-voltar { margin-top: 30px; text-decoration: none; color: #5d70f9; font-weight: 700; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+    <div class="bg-pattern"></div>
+    <header class="header-area">
+        <h1>Agenda</h1>
+        <p style="color: #5d70f9; font-weight: 600;">Organize as atividades e tarefas de Língua Portuguesa.</p>
+    </header>
+
+    <div class="calendar-container">
+        <div class="calendar-header" id="month-display">Janeiro 2024</div>
+        <div class="days-grid" id="calendar-grid">
+            </div>
+    </div>
+
+    <a href="index.html" class="btn-voltar"><i class="fas fa-arrow-left"></i> Voltar ao Início</a>
+
+    <div class="modal" id="task-modal">
+        <div class="modal-content">
+            <h3 id="modal-date-title">Dia 01</h3>
+            <textarea id="task-text" placeholder="O que temos para hoje?"></textarea>
+            <button class="btn-save" id="save-task">Salvar Tarefa</button>
+            <p onclick="closeModal()" style="margin-top: 15px; cursor: pointer; color: #999; font-size: 0.8rem;">Cancelar</p>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAs3OTqOeVVzcxlrcM8Th5ObkhtXca69Ac",
+            authDomain: "mindspace-educacao.firebaseapp.com",
+            projectId: "mindspace-educacao",
+            storageBucket: "mindspace-educacao.firebasestorage.app",
+            messagingSenderId: "569394609531",
+            appId: "1:569394609531:web:9ab5ba6bc2181bc5a911de",
+            databaseURL: "https://mindspace-educacao-default-rtdb.firebaseio.com"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const tasksRef = ref(db, 'dl/apt');
+
+        let currentSelectedDay = null;
+        let allTasks = {};
+
+        // Configurações de data
+        const date = new Date();
+        const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+        
+        function renderCalendar() {
+            const grid = document.getElementById('calendar-grid');
+            const monthDisplay = document.getElementById('month-display');
+            grid.innerHTML = '';
+            
+            monthDisplay.innerText = `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
+
+            const labels = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+            labels.forEach(l => grid.innerHTML += `<div class="day-label">${l}</div>`);
+
+            const firstDay = new Date(date.getFullYear(), date.getMonth(), 1).getDay();
+            const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+
+            // Espaços vazios
+            for (let i = 0; i < firstDay; i++) grid.innerHTML += `<div></div>`;
+
+            // Dias do mês
+            for (let i = 1; i <= lastDay; i++) {
+                const isToday = i === new Date().getDate() && date.getMonth() === new Date().getMonth();
+                const dayId = `${date.getFullYear()}-${date.getMonth() + 1}-${i}`;
+                const hasTask = allTasks[dayId] ? 'has-task' : '';
+                
+                const dayEl = document.createElement('div');
+                dayEl.className = `day ${isToday ? 'today' : ''} ${hasTask}`;
+                dayEl.innerText = i;
+                dayEl.onclick = () => openModal(i, dayId);
+                grid.appendChild(dayEl);
+            }
+        }
+
+        // Abrir Modal
+        window.openModal = (num, id) => {
+            currentSelectedDay = id;
+            document.getElementById('modal-date-title').innerText = `Tarefa para o dia ${num}`;
+            document.getElementById('task-text').value = allTasks[id] || '';
+            document.getElementById('task-modal').style.display = 'flex';
+        };
+
+        window.closeModal = () => {
+            document.getElementById('task-modal').style.display = 'none';
+        };
+
+        // Salvar Tarefa no Firebase
+        document.getElementById('save-task').onclick = () => {
+            const text = document.getElementById('task-text').value;
+            update(tasksRef, { [currentSelectedDay]: text });
+            closeModal();
+        };
+
+        // Ouvir mudanças no Firebase (Tempo Real)
+        onValue(tasksRef, (snapshot) => {
+            allTasks = snapshot.val() || {};
+            renderCalendar();
+        });
+
+    </script>
+</body>
+</html>
