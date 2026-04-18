@@ -9,7 +9,7 @@
      <link rel="icon" href="https://img.icons8.com/ios-filled/200/002663/calculator.png" type="image/png">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
-        body { background-color: #ffffff; min-height: 200vh; display: flex; flex-direction: column; align-items: center; position: relative; padding-bottom: 150px; }
+        body { background-color: #ffffff; min-height: 100vh; display: flex; flex-direction: column; align-items: center; position: relative; padding-bottom: 150px; }
         .bg-pattern { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background-image: linear-gradient(135deg, #4461f2 10%, #7a91f5 10%, #7a91f5 15%, #b2c0f9 15%, #b2c0f9 20%, transparent 20%), linear-gradient(135deg, transparent 80%, #b2c0f9 80%, #b2c0f9 85%, #7a91f5 85%, #7a91f5 90%, #4461f2 90%); opacity: 0.5; }
         
         .welcome-section { text-align: center; margin: 100px 0; animation: fadeInUp 0.8s ease-out; }
@@ -29,6 +29,34 @@
         .menu-card:hover { transform: translateY(-15px); }
         .menu-card i { font-size: 4.5rem; }
         .menu-card span { font-weight: 700; font-size: 1.3rem; text-transform: uppercase; }
+
+        .conteudo-widget { width: 90%; max-width: 850px; background: white; padding: 40px; border-radius: 40px; box-shadow: 0 20px 40px rgba(0,0,0,0.08); margin-bottom: 80px; }
+        .conteudo-widget h2 { margin-bottom: 25px; color: #333; display: flex; align-items: center; gap: 15px; }
+        .conteudo-item { 
+        border-left: 5px solid #5d70f9; 
+        background: #f8f9ff; 
+        padding: 20px; 
+        border-radius: 15px; 
+        margin-bottom: 15px; 
+        position: relative; /* Adicionado para posicionar a lixeira */
+    }
+    .btn-deletar {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        color: #ff4757;
+        cursor: pointer;
+        font-size: 1.1rem;
+        transition: 0.2s;
+        padding: 5px;
+    }
+    .btn-deletar:hover {
+        transform: scale(1.2);
+        color: #ff6b81;
+    }
+        .conteudo-data { font-weight: 700; color: #5d70f9; font-size: 0.9rem; display: block; margin-bottom: 10px; }
+        .conteudo-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+        .tag { background: #5d70f9; color: white; padding: 5px 12px; border-radius: 8px; font-size: 0.8rem; font-weight: 600; }
 
         /* NOVA SEÇÃO DE AGENDA NO DASHBOARD */
         .agenda-preview { width: 90%; max-width: 850px; margin-bottom: 80px; background: #f0f3ff; padding: 40px; border-radius: 40px; }
@@ -68,10 +96,17 @@
 
     <nav class="menu-grid">
         <a href="Médias.html" class="menu-card"><i class="fas fa-chart-line"></i><span>Médias</span></a>
-        <a href="#" class="menu-card"><i class="fas fa-file-signature"></i><span>Gabaritos</span></a>
+        <a href="Conteudo Trabalhado.html" class="menu-card"><i class="fas fa-file-signature"></i><span>Conteúdo Trabalhado</span></a>
         <a href="#" class="menu-card"><i class="fas fa-book-open"></i><span>Livro Digital</span></a>
         <a href="Agenda.html" class="menu-card"><i class="fas fa-calendar-alt"></i><span>Agenda</span></a>
     </nav>
+
+    <section class="conteudo-widget">
+        <h2><i class="fas fa-history" style="color: #5d70f9;"></i> Últimos Conteúdos Trabalhados</h2>
+        <div id="lista-conteudo-trabalhado">
+            <p style="color: #999;">Carregando histórico de aulas...</p>
+        </div>
+    </section>
 
     <section class="agenda-preview">
         <h2><i class="fas fa-tasks" style="color: #5d70f9;"></i> Próximos Deveres de Matemática</h2>
@@ -91,7 +126,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyAs3OTqOeVVzcxlrcM8Th5ObkhtXca69Ac",
@@ -109,8 +144,43 @@
         // Referências
         const dbRef = ref(db, 'dl/mat');
         const agendaRef = ref(db, 'dl/amat');
+        const conteudoTrabalhadoRef = ref(db, 'mat/trabalhados');
 
-        const keys = ['n1', 'n2', 'n3', 'n_outros', 'n_prova'];
+         const keys = ['n1', 'n2', 'n3', 'n_outros', 'n_prova'];
+
+         window.removerConteudo = (id) => {
+            if (confirm("Tem certeza que deseja apagar este registro de aula?")) {
+                const itemRef = ref(db, `mat/trabalhados/${id}`);
+                remove(itemRef)
+                    .then(() => alert("Registro removido!"))
+                    .catch((error) => alert("Erro ao remover: " + error.message));
+            }}
+
+        onValue(conteudoTrabalhadoRef, (snapshot) => {
+            const container = document.getElementById('lista-conteudo-trabalhado');
+            container.innerHTML = '';
+            const dados = snapshot.val();
+
+            if (dados) {
+                // entries() nos dá o ID e o Valor
+                const lista = Object.entries(dados).reverse();
+                lista.forEach(([id, item]) => {
+                    const div = document.createElement('div');
+                    div.className = 'conteudo-item';
+                    
+                    const tagsHtml = item.itens ? item.itens.map(txt => `<span class="tag">${txt}</span>`).join('');
+                    
+                    div.innerHTML = `
+                        <i class="fas fa-trash-alt btn-deletar" onclick="window.removerConteudo('${id}')"></i>
+                        <span class="conteudo-data"><i class="far fa-calendar-alt"></i> ${item.data} às ${item.hora}</span>
+                        <div class="conteudo-tags">${tagsHtml}</div>
+                    `;
+                    container.appendChild(div);
+                });
+            } else {
+                container.innerHTML = '<p style="color: #999;">Nenhum conteúdo registrado ainda.</p>';
+            }
+        });
 
         // LÓGICA DAS NOTAS
         onValue(dbRef, (snapshot) => {
