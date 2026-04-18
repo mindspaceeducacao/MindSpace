@@ -126,129 +126,135 @@
     </section>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, onValue, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyAs3OTqOeVVzcxlrcM8Th5ObkhtXca69Ac",
-            authDomain: "mindspace-educacao.firebaseapp.com",
-            projectId: "mindspace-educacao",
-            storageBucket: "mindspace-educacao.firebasestorage.app",
-            messagingSenderId: "569394609531",
-            appId: "1:569394609531:web:9ab5ba6bc2181bc5a911de",
-            databaseURL: "https://mindspace-educacao-default-rtdb.firebaseio.com/"
-        };
+    const firebaseConfig = {
+        apiKey: "AIzaSyAs3OTqOeVVzcxlrcM8Th5ObkhtXca69Ac",
+        authDomain: "mindspace-educacao.firebaseapp.com",
+        projectId: "mindspace-educacao",
+        storageBucket: "mindspace-educacao.firebasestorage.app",
+        messagingSenderId: "569394609531",
+        appId: "1:569394609531:web:9ab5ba6bc2181bc5a911de",
+        databaseURL: "https://mindspace-educacao-default-rtdb.firebaseio.com/"
+    };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-        
-        // Referências
-        const dbRef = ref(db, 'hadassa/cien');
-        const agendaRef = ref(db, 'hadassa/acien');
-        const conteudoTrabalhadoRef = ref(db, 'cien/trabalhados');
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    
+    // Referências (Caminhos de Ciências)
+    const dbRef = ref(db, 'hadassa/cien');
+    const agendaRef = ref(db, 'hadassa/acien');
+    const conteudoTrabalhadoRef = ref(db, 'cien/trabalhados');
 
-         const keys = ['n1', 'n2', 'n3', 'n_outros', 'n_prova'];
+    const keys = ['n1', 'n2', 'n3', 'n_outros', 'n_prova'];
 
-         window.removerConteudo = (id) => {
-            if (confirm("Tem certeza que deseja apagar este registro de aula?")) {
-                const itemRef = ref(db, `cien/trabalhados/${id}`);
-                remove(itemRef)
-                    .then(() => alert("Registro removido!"))
-                    .catch((error) => alert("Erro ao remover: " + error.message));
-            }}
+    // FUNÇÃO PARA REMOVER
+    window.removerConteudo = (id) => {
+        if (confirm("Tem certeza que deseja apagar este registro de aula?")) {
+            const itemRef = ref(db, `cien/trabalhados/${id}`);
+            remove(itemRef)
+                .then(() => alert("Registro removido!"))
+                .catch((error) => alert("Erro ao remover: " + error.message));
+        }
+    };
 
-        onValue(conteudoTrabalhadoRef, (snapshot) => {
-            const container = document.getElementById('lista-conteudo-trabalhado');
-            container.innerHTML = '';
-            const dados = snapshot.val();
+    // LÓGICA DO HISTÓRICO (CORRIGIDA)
+    onValue(conteudoTrabalhadoRef, (snapshot) => {
+        const container = document.getElementById('lista-conteudo-trabalhado');
+        container.innerHTML = '';
+        const dados = snapshot.val();
 
-            if (dados) {
-                // entries() nos dá o ID e o Valor
-                const lista = Object.entries(dados).reverse();
-                lista.forEach(([id, item]) => {
-                    const div = document.createElement('div');
-                    div.className = 'conteudo-item';
-                    
-                    const tagsHtml = item.itens ? item.itens.map(txt => `<span class="tag">${txt}</span>`).join('');
-                    
-                    div.innerHTML = `
-                        <i class="fas fa-trash-alt btn-deletar" onclick="window.removerConteudo('${id}')"></i>
-                        <span class="conteudo-data"><i class="far fa-calendar-alt"></i> ${item.data} às ${item.hora}</span>
-                        <div class="conteudo-tags">${tagsHtml}</div>
-                    `;
-                    container.appendChild(div);
-                });
-            } else {
-                container.innerHTML = '<p style="color: #999;">Nenhum conteúdo registrado ainda.</p>';
-            }
-        });
-
-        // LÓGICA DAS NOTAS
-        onValue(dbRef, (snapshot) => {
-            const data = snapshot.val();
-            let preenchidos = 0;
-            let somaTotal = 0;
-
-            if (data) {
-                keys.forEach(key => {
-                    const valor = data[key];
-                    if (valor !== undefined && valor !== "") {
-                        preenchidos++;
-                        somaTotal += parseFloat(valor) || 0;
-                        document.getElementById('val-' + key).innerText = valor;
-                        const st = document.getElementById('status-' + key);
-                        st.innerText = "Lançado"; st.style.color = "#27ae60";
-                    }
-                });
-                if (data.titulo_outros) document.getElementById('label-outros').innerText = data.titulo_outros;
-            }
-
-            const progresso = preenchidos * 20;
-            document.getElementById('porcentagem-texto').innerText = progresso + "%";
-            document.getElementById('grafico').style.background = `conic-gradient(#5d70f9 ${progresso}%, #eee 0)`;
-            document.getElementById('media-total-dash').innerText = somaTotal.toFixed(1);
-        });
-
-        // LÓGICA DA AGENDA (Preview no Dashboard)
-        onValue(agendaRef, (snapshot) => {
-            const tarefas = snapshot.val();
-            const container = document.getElementById('lista-tarefas-dash');
-            container.innerHTML = '';
-
-            if (tarefas) {
-                // Filtramos e ordenamos as tarefas para mostrar apenas as que têm conteúdo
-                const entries = Object.entries(tarefas).filter(([data, texto]) => texto.trim() !== "");
+        if (dados) {
+            const lista = Object.entries(dados).reverse();
+            lista.forEach(([id, item]) => {
+                const div = document.createElement('div');
+                div.className = 'conteudo-item';
                 
-                if (entries.length === 0) {
-                    container.innerHTML = '<p style="color: #999;">Nenhum dever pendente.</p>';
-                } else {
-                    entries.forEach(([dataCompleta, texto]) => {
-                        // Formata a data de YYYY-MM-DD para DD/MM
-                        const partes = dataCompleta.split('-');
-                        const dataFormatada = `${partes[2]}/${partes[1]}`;
+                // Verificação de segurança para não travar se não houver tags
+                const tagsHtml = (item.itens && Array.isArray(item.itens)) 
+                    ? item.itens.map(txt => `<span class="tag">${txt}</span>`).join('') 
+                    : '';
+                
+                div.innerHTML = `
+                    <i class="fas fa-trash-alt btn-deletar" onclick="window.removerConteudo('${id}')"></i>
+                    <span class="conteudo-data"><i class="far fa-calendar-alt"></i> ${item.data} às ${item.hora}</span>
+                    <div class="conteudo-tags">${tagsHtml}</div>
+                `;
+                container.appendChild(div);
+            });
+        } else {
+            container.innerHTML = '<p style="color: #999;">Nenhum conteúdo registrado ainda.</p>';
+        }
+    });
 
-                        const item = document.createElement('div');
-                        item.className = 'task-item-dash';
-                        item.innerHTML = `
-                            <span style="font-weight: 600; color: #444;">${texto}</span>
-                            <span class="task-date-tag">${dataFormatada}</span>
-                        `;
-                        container.appendChild(item);
-                    });
+    // LÓGICA DAS NOTAS
+    onValue(dbRef, (snapshot) => {
+        const data = snapshot.val();
+        let preenchidos = 0;
+        let somaTotal = 0;
+
+        if (data) {
+            keys.forEach(key => {
+                const valor = data[key];
+                if (valor !== undefined && valor !== "") {
+                    preenchidos++;
+                    somaTotal += parseFloat(valor) || 0;
+                    const elVal = document.getElementById('val-' + key);
+                    const elSt = document.getElementById('status-' + key);
+                    
+                    if(elVal) elVal.innerText = valor;
+                    if(elSt) {
+                        elSt.innerText = "Lançado"; 
+                        elSt.style.color = "#27ae60";
+                    }
                 }
-            } else {
-                container.innerHTML = '<p style="color: #999;">Nenhum dever pendente.</p>';
-            }
-        });
+            });
+            if (data.titulo_outros) document.getElementById('label-outros').innerText = data.titulo_outros;
+        }
 
-        // Data e Saudação
-        const agora = new Date();
-        const hora = agora.getHours();
-        const saudacao = document.getElementById('saudacao');
-        if (hora < 12) saudacao.innerText = "Bom dia, Hadassa!";
-        else if (hora < 18) saudacao.innerText = "Boa tarde, Hadassa!";
-        else saudacao.innerText = "Boa noite, Hadassa!";
-        document.getElementById('data-atual').innerText = agora.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
-    </script>
+        const progresso = preenchidos * 20;
+        document.getElementById('porcentagem-texto').innerText = progresso + "%";
+        document.getElementById('grafico').style.background = `conic-gradient(#5d70f9 ${progresso}%, #eee 0)`;
+        document.getElementById('media-total-dash').innerText = somaTotal.toFixed(1);
+    });
+
+    // LÓGICA DA AGENDA
+    onValue(agendaRef, (snapshot) => {
+        const tarefas = snapshot.val();
+        const container = document.getElementById('lista-tarefas-dash');
+        container.innerHTML = '';
+
+        if (tarefas) {
+            const entries = Object.entries(tarefas).filter(([data, texto]) => texto && texto.trim() !== "");
+            if (entries.length === 0) {
+                container.innerHTML = '<p style="color: #999;">Nenhum dever pendente.</p>';
+            } else {
+                entries.forEach(([dataCompleta, texto]) => {
+                    const partes = dataCompleta.split('-');
+                    const dataFormatada = partes.length === 3 ? `${partes[2]}/${partes[1]}` : dataCompleta;
+                    const item = document.createElement('div');
+                    item.className = 'task-item-dash';
+                    item.innerHTML = `
+                        <span style="font-weight: 600; color: #444;">${texto}</span>
+                        <span class="task-date-tag">${dataFormatada}</span>
+                    `;
+                    container.appendChild(item);
+                });
+            }
+        } else {
+            container.innerHTML = '<p style="color: #999;">Nenhum dever pendente.</p>';
+        }
+    });
+
+    // DATA E SAUDAÇÃO
+    const agora = new Date();
+    const hora = agora.getHours();
+    const saudacao = document.getElementById('saudacao');
+    if (hora < 12) saudacao.innerText = "Bom dia, Educador!";
+    else if (hora < 18) saudacao.innerText = "Boa tarde, Educador!";
+    else saudacao.innerText = "Boa noite, Educador!";
+    document.getElementById('data-atual').innerText = agora.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' });
+</script>
 </body>
 </html>
