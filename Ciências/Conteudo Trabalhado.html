@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conteúdo Trabalhado</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
+        body { background-color: #ffffff; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding-bottom: 50px; }
+        .bg-pattern { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background-image: linear-gradient(135deg, #4461f2 10%, #7a91f5 10%, #7a91f5 15%, #b2c0f9 15%, #b2c0f9 20%, transparent 20%); opacity: 0.5; }
+        .btn-voltar { position: absolute; top: 20px; left: 20px; background: white; border: none; padding: 10px 20px; border-radius: 15px; cursor: pointer; font-weight: 700; color: #5d70f9; box-shadow: 0 5px 15px rgba(0,0,0,0.1); text-decoration: none; display: flex; align-items: center; gap: 8px; z-index: 10; }
+        header { text-align: center; margin: 80px 0 40px 0; }
+        header h1 { font-size: 2rem; color: #333; }
+        header i { color: #5d70f9; font-size: 3rem; margin-bottom: 10px; }
+        .section-container { background: white; width: 90%; max-width: 600px; padding: 30px; border-radius: 30px; box-shadow: 0 15px 35px rgba(0,0,0,0.08); margin-bottom: 30px; }
+        .section-title { font-size: 1.2rem; font-weight: 700; color: #5d70f9; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; border-bottom: 2px solid #f0f2ff; padding-bottom: 10px; }
+        .options-grid { display: flex; flex-direction: column; gap: 12px; }
+        .option-item { display: flex; align-items: center; gap: 12px; padding: 12px; border-radius: 12px; background: #f8f9ff; cursor: pointer; }
+        .option-item input[type="checkbox"] { width: 20px; height: 20px; accent-color: #5d70f9; }
+        .option-item span { font-weight: 600; color: #444; }
+        .dynamic-item { display: flex; align-items: center; gap: 10px; background: #fff4e5; padding: 12px; border-radius: 15px; border: 2px dashed #f39c12; margin-top: 5px; }
+        .input-outro { flex-grow: 1; padding: 8px; border-radius: 8px; border: 1px solid #ddd; outline: none; font-weight: 600; }
+        .btn-mais { background: #5d70f9; border: none; padding: 12px 20px; border-radius: 15px; cursor: pointer; font-size: 0.9rem; font-weight: 700; color: white; margin-top: 10px; display: flex; align-items: center; gap: 8px; }
+        .btn-lancar { background: #2ecc71; color: white; border: none; padding: 20px; border-radius: 20px; font-size: 1.2rem; font-weight: 700; cursor: pointer; width: 90%; max-width: 600px; box-shadow: 0 10px 20px rgba(46, 204, 113, 0.3); }
+    </style>
+</head>
+<body>
+    <div class="bg-pattern"></div>
+    <a href="Área do Educador.html" class="btn-voltar"><i class="fas fa-arrow-left"></i> Voltar</a>
+
+    <header>
+        <i class="fas fa-book-open"></i>
+        <h1>Conteúdo Trabalhado</h1>
+    </header>
+
+    <div class="section-container">
+        <div class="section-title"><i class="fas fa-list-check"></i> Conteúdo</div>
+        <div class="options-grid" id="container-conteudo">
+            <label class="option-item"><input type="checkbox" value="Capítulo 1 - O Alfabeto"> <span>Capítulo 1 - O Alfabeto</span></label>
+            <label class="option-item"><input type="checkbox" value="Capítulo 2 - As Sílabas"> <span>Capítulo 2 - As Sílabas</span></label>
+            <label class="option-item"><input type="checkbox" value="Capítulo 3 - Substantivos e Adjetivos"> <span>Capítulo 3 - Substantivos e Adjetivos</span></label>
+            <div id="dinamico-conteudo"></div>
+            <button class="btn-mais" onclick="window.adicionarCampo('dinamico-conteudo')"><i class="fas fa-plus"></i> Adicionar Conteúdo</button>
+        </div>
+    </div>
+
+    <div class="section-container">
+        <div class="section-title"><i class="fas fa-pencil-alt"></i> Atividades</div>
+        <div class="options-grid" id="container-atividades">
+            <label class="option-item"><input type="checkbox" value="Revisando - Cap 1"> <span>Revisando - Capítulo 1</span></label>
+            <label class="option-item"><input type="checkbox" value="Praticando - Cap 1"> <span>Praticando - Capítulo 1</span></label>
+            <label class="option-item"><input type="checkbox" value="Revisando - Cap 2"> <span>Revisando - Capítulo 2</span></label>
+            <label class="option-item"><input type="checkbox" value="Praticando - Cap 2"> <span>Praticando - Capítulo 2</span></label>
+            <label class="option-item"><input type="checkbox" value="Revisando - Cap 3"> <span>Revisando - Capítulo 3</span></label>
+            <label class="option-item"><input type="checkbox" value="Praticando - Cap 3"> <span>Praticando - Capítulo 3</span></label>
+            <div id="dinamico-atividades"></div>
+            <button class="btn-mais" onclick="window.adicionarCampo('dinamico-atividades')"><i class="fas fa-plus"></i> Adicionar Atividade</button>
+        </div>
+    </div>
+
+    <button class="btn-lancar" onclick="window.lancarConteudo()">Lançar Conteúdo de Hoje</button>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAs3OTqOeVVzcxlrcM8Th5ObkhtXca69Ac",
+            authDomain: "mindspace-educacao.firebaseapp.com",
+            projectId: "mindspace-educacao",
+            storageBucket: "mindspace-educacao.firebasestorage.app",
+            messagingSenderId: "569394609531",
+            appId: "1:569394609531:web:9ab5ba6bc2181bc5a911de",
+            databaseURL: "https://mindspace-educacao-default-rtdb.firebaseio.com/"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        window.adicionarCampo = (containerId) => {
+            const container = document.getElementById(containerId);
+            const div = document.createElement('div');
+            div.className = 'dynamic-item';
+            div.innerHTML = `
+                <input type="checkbox" class="cb-dinamica" checked style="width:20px; height:20px;">
+                <input type="text" class="input-outro" placeholder="Escreva o item...">
+                <i class="fas fa-times" style="color:#ff4757; cursor:pointer;" onclick="this.parentElement.remove()"></i>
+            `;
+            container.appendChild(div);
+        };
+
+        window.lancarConteudo = () => {
+            const selecionados = [];
+            document.querySelectorAll('input[type="checkbox"]:checked').forEach(cb => {
+                if(cb.classList.contains('cb-dinamica')) {
+                    const texto = cb.parentElement.querySelector('.input-outro').value.trim();
+                    if(texto) selecionados.push(texto);
+                } else {
+                    selecionados.push(cb.value);
+                }
+            });
+
+            if(selecionados.length === 0) return alert("Selecione algo!");
+
+            const registroRef = ref(db, 'cien/trabalhados');
+            push(registroRef, {
+                itens: selecionados,
+                data: new Date().toLocaleDateString('pt-BR'),
+                hora: new Date().toLocaleTimeString('pt-BR')
+            }).then(() => {
+                alert("✅ Conteúdo lançado com sucesso!");
+                window.location.reload();
+            }).catch(err => alert("Erro: " + err.message));
+        };
+    </script>
+</body>
+</html>
