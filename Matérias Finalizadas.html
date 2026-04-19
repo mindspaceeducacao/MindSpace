@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conteúdos Finalizados</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="https://img.icons8.com/ios-filled/200/002663/book.png" type="image/png">
+    
+    <style>
+        :root {
+            --azul-escuro: #2e3d59;
+            --azul-medio: #6a85a4;
+            --azul-claro: #f0f4f8;
+            --branco: #ffffff;
+        }
+
+        body { margin: 0; padding: 0; font-family: 'Montserrat', sans-serif; background-color: var(--azul-claro); color: var(--azul-escuro); min-height: 100vh; }
+
+        .header { position: relative; background-color: var(--branco); height: 160px; display: flex; align-items: center; padding: 0 8%; z-index: 5; box-shadow: 0 2px 15px rgba(0,0,0,0.05); }
+        
+        .main-container { max-width: 1000px; margin: 40px auto; padding: 0 20px; }
+
+        .page-title { margin-bottom: 30px; }
+        .page-title h2 { font-size: 28px; margin: 0; color: var(--azul-escuro); }
+        .page-title p { color: var(--azul-medio); margin: 5px 0 0 0; font-weight: 500; }
+
+        .subjects-grid { display: grid; grid-template-columns: 1fr; gap: 20px; }
+        
+        .subject-card { 
+            background: var(--branco); 
+            border-radius: 28px; 
+            padding: 30px; 
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05); 
+            animation: fadeIn 0.6s ease;
+        }
+
+        .subject-header { 
+            display: flex; 
+            align-items: center; 
+            gap: 15px; 
+            margin-bottom: 20px; 
+            border-bottom: 2px solid var(--azul-claro); 
+            padding-bottom: 15px; 
+        }
+        
+        .subject-icon { 
+            width: 50px; 
+            height: 50px; 
+            border-radius: 15px; 
+            color: white; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 22px; 
+        }
+
+        .items-container { display: flex; flex-wrap: wrap; gap: 10px; }
+        
+        .topic-pill { 
+            padding: 8px 18px; 
+            border-radius: 12px; 
+            font-size: 14px; 
+            font-weight: 600; 
+            border: 1px solid;
+            transition: 0.3s;
+        }
+
+        .empty-msg { color: #aaa; font-style: italic; }
+        .btn-voltar { display: inline-block; margin-top: 30px; text-decoration: none; color: var(--azul-medio); font-weight: 700; transition: 0.3s; }
+        .btn-voltar:hover { color: var(--azul-escuro); }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h1 style="font-size: 22px; margin: 0;">Matérias Finalizadas</h1>
+                <small style="color: var(--azul-medio); font-weight: 600;">Histórico de conteúdos trabalhados</small>
+            </div>
+            <i class="fa-solid fa-book-bookmark" style="font-size: 35px; color: var(--azul-medio); opacity: 0.5;"></i>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <div class="subjects-grid" id="main-grid">
+            </div>
+
+        <a href="Espaço do Aluno.html" class="btn-voltar"><i class="fas fa-arrow-left"></i> Voltar ao Espaço do Aluno</a>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        // Configuração idêntica aos seus arquivos
+        const firebaseConfig = {
+            apiKey: "AIzaSyAs3OTqOeVVzcxlrcM8Th5ObkhtXca69Ac",
+            authDomain: "mindspace-educacao.firebaseapp.com",
+            projectId: "mindspace-educacao",
+            storageBucket: "mindspace-educacao.firebasestorage.app",
+            messagingSenderId: "569394609531",
+            appId: "1:569394609531:web:9ab5ba6bc2181bc5a911de",
+            databaseURL: "https://mindspace-educacao-default-rtdb.firebaseio.com"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Mapeamento baseado no seu Espaço do Aluno
+        const subjects = [
+            { name: 'Artes', workPath: 'artes/trabalhados', icon: 'fa-palette', color: '#e91e63' },
+            { name: 'Ciências', workPath: 'cien/trabalhados', icon: 'fa-microscope', color: '#27ae60' },
+            { name: 'Português', workPath: 'pt/trabalhados', icon: 'fa-language', color: '#9b59b6' },
+            { name: 'Matemática', workPath: 'mat/trabalhados', icon: 'fa-calculator', color: '#2980b9' }
+        ];
+
+        let allData = {};
+
+        function init() {
+            subjects.forEach(s => {
+                onValue(ref(db, s.workPath), snap => {
+                    allData[s.name] = snap.val();
+                    renderAll();
+                });
+            });
+        }
+
+        function renderAll() {
+            const grid = document.getElementById('main-grid');
+            grid.innerHTML = '';
+
+            subjects.forEach(s => {
+                const data = allData[s.name];
+                let allTopics = [];
+
+                if (data && typeof data === 'object') {
+                    Object.keys(data).forEach(key => {
+                        if (data[key].itens && Array.isArray(data[key].itens)) {
+                            allTopics = [...allTopics, ...data[key].itens];
+                        }
+                    });
+                }
+
+                // Criar Card da Matéria
+                const card = document.createElement('div');
+                card.className = 'subject-card';
+                
+                const topicsHtml = allTopics.length > 0 
+                    ? allTopics.map(topic => `
+                        <div class="topic-pill" style="background: ${s.color}10; color: ${s.color}; border-color: ${s.color}30;">
+                            ${topic}
+                        </div>`).join('')
+                    : '<p class="empty-msg">Nenhum conteúdo registrado ainda.</p>';
+
+                card.innerHTML = `
+                    <div class="subject-header">
+                        <div class="subject-icon" style="background: ${s.color}; box-shadow: 0 4px 12px ${s.color}40;">
+                            <i class="fa-solid ${s.icon}"></i>
+                        </div>
+                        <h3 style="margin:0; font-size: 20px;">${s.name}</h3>
+                    </div>
+                    <div class="items-container">
+                        ${topicsHtml}
+                    </div>
+                `;
+                
+                grid.appendChild(card);
+            });
+        }
+
+        init();
+    </script>
+</body>
+</html>

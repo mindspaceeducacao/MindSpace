@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Espaço do Aluno</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="https://img.icons8.com/ios-filled/200/002663/students.png" type="image/png">
+    
+    <style>
+        :root {
+            --azul-escuro: #2e3d59;
+            --azul-medio: #6a85a4;
+            --azul-claro: #f0f4f8;
+            --branco: #ffffff;
+        }
+
+        body { margin: 0; padding: 0; font-family: 'Montserrat', sans-serif; background-color: var(--azul-claro); color: var(--azul-escuro); min-height: 100vh; }
+
+        .header { position: relative; background-color: var(--branco); height: 180px; display: flex; align-items: center; padding: 0 8%; z-index: 5; }
+        .waves-header { position: absolute; top: 0; left: 0; width: 100%; line-height: 0; z-index: -1; }
+        
+        .main-container { max-width: 1100px; margin: -30px auto 60px auto; padding: 0 20px; position: relative; z-index: 10; }
+
+        .motivation-banner { 
+            background: linear-gradient(135deg, var(--azul-escuro), var(--azul-medio)); 
+            color: white; padding: 45px; border-radius: 32px; margin-bottom: 35px; 
+            display: flex; justify-content: space-between; align-items: center; 
+            box-shadow: 0 15px 35px rgba(46, 61, 89, 0.25); 
+        }
+        .motivation-text h2 { font-size: 26px; margin: 0 0 10px 0; font-weight: 700; }
+
+        .menu-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; margin-bottom: 35px; }
+        .menu-card { background: var(--branco); padding: 25px; border-radius: 25px; text-align: center; text-decoration: none; color: var(--azul-escuro); box-shadow: 0 8px 20px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 10px; transition: 0.3s; }
+        .menu-card i { font-size: 32px; color: var(--azul-medio); }
+        .menu-card:hover { transform: translateY(-5px); background: var(--azul-escuro); color: white; }
+        .menu-card:hover i { color: white; }
+
+        .content-sections { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; align-items: start; }
+        .card-box { background: var(--branco); padding: 30px; border-radius: 28px; box-shadow: 0 8px 20px rgba(0,0,0,0.05); }
+        .tasks-widget { grid-row: span 2; min-height: 500px; }
+
+        h3 { display: flex; align-items: center; gap: 10px; margin-top: 0; font-size: 20px; border-bottom: 2px solid var(--azul-claro); padding-bottom: 15px; }
+        .empty-msg { color: #999; font-style: italic; margin-top: 20px; text-align: center; width: 100%; }
+
+        .item-row { display: flex; align-items: center; gap: 15px; padding: 15px 0; border-bottom: 1px solid #f0f0f0; animation: fadeIn 0.5s ease; }
+        .item-icon { width: 45px; height: 45px; border-radius: 12px; color: white; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+        .item-info { flex-grow: 1; }
+        .item-info small { color: #aaa; font-weight: 700; text-transform: uppercase; font-size: 11px; }
+        .item-info strong { display: block; font-size: 15px; margin-top: 2px; }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @media (max-width: 850px) { .content-sections { grid-template-columns: 1fr; } .tasks-widget { grid-row: auto; min-height: auto; } }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="waves-header">
+            <svg viewBox="0 0 500 150" preserveAspectRatio="none" style="height: 160px; width: 100%;"><path d="M0.00,49.98 C149.99,150.00 349.20,-49.98 500.00,49.98 L500.00,0.00 L0.00,0.00 Z" style="stroke: none; fill: #6a85a4; opacity: 0.1;"></path></svg>
+        </div>
+        <div style="width: 100%; display: flex; justify-content: space-between; align-items: center;">
+            <h1 style="font-size: 24px;">Espaço do Aluno</h1>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <div style="text-align: right;"><span style="font-weight: 700; display: block;">Ester Burbon</span><small>1º Ano - E.F.</small></div>
+                <div style="width: 50px; height: 50px; background: var(--azul-escuro); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;"><i class="fa-solid fa-user"></i></div>
+            </div>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <div class="motivation-banner">
+            <div class="motivation-text">
+                <h2>""O sucesso é a soma de pequenos esforços repetidos dia após dia."</h2>
+                <p>Ester, confira os conteúdos e tarefas de hoje.</p>
+            </div>
+            <i class="fa-solid fa-graduation-cap" style="font-size: 50px; opacity: 0.3;"></i>
+        </div>
+
+        <div class="menu-grid">
+            <a href="Minha Agenda.html" class="menu-card"><i class="fa-solid fa-clone"></i><span>MindCards</span></a>
+            <a href="#" class="menu-card"><i class="fa-solid fa-calendar-day"></i><span>Agenda</span></a>
+            <a href="#" class="menu-card"><i class="fa-solid fa-book"></i><span>Livros</span></a>
+            <a href="#" class="menu-card"><i class="fa-solid fa-square-check"></i><span>Matérias Finalizadas</span></a>
+        </div>
+
+        <div class="content-sections">
+            <div class="card-box tasks-widget">
+                <h3><i class="fa-solid fa-list-check" style="color: #4461f2;"></i> Próximas Tarefas</h3>
+                <div id="tasks-container"><p class="empty-msg">Sincronizando tarefas...</p></div>
+            </div>
+
+            <div class="card-box">
+                <h3><i class="fa-solid fa-chalkboard-user" style="color: #4461f2;"></i> Matérias do Dia</h3>
+                <div id="today-subjects-container"><p class="empty-msg">Buscando aulas de hoje...</p></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAs3OTqOeVVzcxlrcM8Th5ObkhtXca69Ac",
+            authDomain: "mindspace-educacao.firebaseapp.com",
+            projectId: "mindspace-educacao",
+            storageBucket: "mindspace-educacao.firebasestorage.app",
+            messagingSenderId: "569394609531",
+            appId: "1:569394609531:web:9ab5ba6bc2181bc5a911de",
+            databaseURL: "https://mindspace-educacao-default-rtdb.firebaseio.com"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        const subjects = [
+            { name: 'Artes', taskPath: 'hadassa/aartes', workPath: 'artes/trabalhados', icon: 'fa-palette', color: '#e91e63' },
+            { name: 'Ciências', taskPath: 'hadassa/acien', workPath: 'cien/trabalhados', icon: 'fa-microscope', color: '#27ae60' },
+            { name: 'Português', taskPath: 'dl/apt', workPath: 'pt/trabalhados', icon: 'fa-language', color: '#9b59b6' },
+            { name: 'Matemática', taskPath: 'dl/amat', workPath: 'mat/trabalhados', icon: 'fa-calculator', color: '#2980b9' }
+        ];
+
+        let allTasksData = {};
+        let allWorksData = {};
+
+        function init() {
+            subjects.forEach(s => {
+                // Escutar Tarefas
+                onValue(ref(db, s.taskPath), snap => {
+                    allTasksData[s.name] = snap.val();
+                    renderTasks();
+                });
+
+                // Escutar Trabalhados
+                onValue(ref(db, s.workPath), snap => {
+                    allWorksData[s.name] = snap.val();
+                    renderWorks();
+                });
+            });
+        }
+
+        function renderTasks() {
+            const container = document.getElementById('tasks-container');
+            const hoje = new Date().setHours(0,0,0,0);
+            let list = [];
+
+            subjects.forEach(s => {
+                const data = allTasksData[s.name];
+                if (data) {
+                    Object.keys(data).forEach(dateStr => {
+                        const text = data[dateStr];
+                        if (text && text.trim() !== "") {
+                            const cleanDate = dateStr.replace(/-/g, '/');
+                            const tTime = new Date(cleanDate).setHours(0,0,0,0);
+                            if (tTime >= hoje) {
+                                list.push({ date: cleanDate, text, color: s.color, icon: s.icon, time: tTime, subject: s.name });
+                            }
+                        }
+                    });
+                }
+            });
+
+            if (list.length === 0) {
+                container.innerHTML = `<p class="empty-msg">Nenhuma tarefa pendente.</p>`;
+                return;
+            }
+
+            container.innerHTML = list.sort((a,b) => a.time - b.time).map(t => `
+                <div class="item-row">
+                    <div class="item-icon" style="background:${t.color}"><i class="fa-solid ${t.icon}"></i></div>
+                    <div class="item-info">
+                        <small>${new Date(t.date).toLocaleDateString('pt-BR', {day:'2-digit', month:'short'})} • ${t.subject}</small>
+                        <strong>${t.text}</strong>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderWorks() {
+    const container = document.getElementById('today-subjects-container');
+    let list = [];
+
+    subjects.forEach(s => {
+        const data = allWorksData[s.name];
+        
+        if (data && typeof data === 'object') {
+            Object.keys(data).forEach(key => {
+                const registro = data[key];
+                
+                if (registro.itens && Array.isArray(registro.itens)) {
+                    // Criamos as subdivisões como "Tags/Pills" elegantes
+                    const tagsHtml = registro.itens.map(item => `
+                        <span style="
+                            display: inline-block;
+                            background: ${s.color}15; /* Cor da matéria com 15% de opacidade */
+                            color: ${s.color};
+                            padding: 4px 12px;
+                            border-radius: 8px;
+                            font-size: 12px;
+                            font-weight: 600;
+                            margin: 4px 4px 0 0;
+                            border: 1px solid ${s.color}30;
+                        ">
+                            ${item}
+                        </span>
+                    `).join('');
+                    
+                    list.push({ 
+                        subject: s.name, 
+                        tags: tagsHtml, 
+                        color: s.color, 
+                        icon: s.icon 
+                    });
+                }
+            });
+        }
+    });
+
+    if (list.length === 0) {
+        container.innerHTML = `<p class="empty-msg">Nenhum conteúdo lançado hoje.</p>`;
+        return;
+    }
+
+    container.innerHTML = list.map(item => `
+        <div class="item-row" style="padding: 20px 0; border-bottom: 1px solid #f0f4f8;">
+            <div class="item-icon" style="background:${item.color}; box-shadow: 0 4px 10px ${item.color}40;">
+                <i class="fa-solid ${item.icon}"></i>
+            </div>
+            <div class="item-info" style="margin-left: 15px;">
+                <small style="letter-spacing: 1px; color: #888;">MATÉRIA DO DIA</small>
+                <strong style="font-size: 18px; margin-bottom: 8px; display: block;">${item.subject}</strong>
+                <div style="display: flex; flex-wrap: wrap;">
+                    ${item.tags}
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+        init();
+    </script>
+</body>
+</html>

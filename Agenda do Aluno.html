@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minha Agenda</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" href="https://img.icons8.com/ios-filled/200/002663/tear-off-calendar.png" type="image/png">
+    
+    <style>
+        :root {
+            --azul-escuro: #2e3d59;
+            --azul-medio: #6a85a4;
+            --azul-claro: #f0f4f8;
+            --branco: #ffffff;
+            --verde: #27ae60;
+        }
+
+        body { margin: 0; padding: 0; font-family: 'Montserrat', sans-serif; background-color: var(--azul-claro); color: var(--azul-escuro); }
+
+        .header { background: var(--branco); padding: 30px 8%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        
+        .main-container { max-width: 900px; margin: 40px auto; padding: 0 20px; }
+
+        .calendar-card { background: var(--branco); padding: 40px; border-radius: 32px; box-shadow: 0 15px 35px rgba(0,0,0,0.05); }
+        .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; color: var(--azul-escuro); font-weight: 700; font-size: 1.8rem; }
+        
+        .days-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px; text-align: center; }
+        .day-label { font-weight: 700; color: var(--azul-medio); font-size: 0.85rem; text-transform: uppercase; padding-bottom: 15px; }
+        
+        .day { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 18px; cursor: pointer; transition: 0.3s; font-weight: 600; background: #f8f9fa; border: 2px solid transparent; position: relative; }
+        .day:hover { background: var(--azul-claro); border-color: var(--azul-medio); }
+        .day.today { background: var(--azul-escuro); color: white; box-shadow: 0 8px 15px rgba(46, 61, 89, 0.3); }
+        
+        /* Indicador de tarefa multicor */
+        .task-dots { display: flex; gap: 3px; position: absolute; bottom: 8px; }
+        .dot { width: 5px; height: 5px; border-radius: 50%; }
+
+        /* Modal Estilizado */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(46, 61, 89, 0.8); align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(5px); }
+        .modal-content { background: white; padding: 40px; border-radius: 30px; width: 90%; max-width: 500px; }
+        .modal-content h3 { margin-bottom: 20px; color: var(--azul-escuro); border-bottom: 2px solid var(--azul-claro); padding-bottom: 10px; }
+        
+        .task-list-display { text-align: left; max-height: 300px; overflow-y: auto; }
+        .task-item { padding: 12px; border-radius: 12px; margin-bottom: 10px; border-left: 5px solid var(--azul-medio); background: var(--azul-claro); }
+        .task-item strong { display: block; font-size: 12px; color: var(--azul-medio); text-transform: uppercase; }
+        .task-item p { margin: 5px 0 0; font-size: 15px; font-weight: 500; }
+
+        .btn-close { background: var(--azul-escuro); color: white; border: none; padding: 12px 30px; border-radius: 15px; cursor: pointer; font-weight: 700; width: 100%; margin-top: 20px; }
+        
+        .btn-voltar { display: inline-block; margin-top: 20px; text-decoration: none; color: var(--azul-medio); font-weight: 600; }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div>
+            <h1 style="font-size: 22px;">Minha Agenda Escolar</h1>
+            <p style="color: var(--azul-medio); font-size: 14px;">Visualize suas tarefas e compromissos.</p>
+        </div>
+        <i class="fa-solid fa-calendar-check" style="font-size: 30px; color: var(--azul-escuro);"></i>
+    </header>
+
+    <div class="main-container">
+        <div class="calendar-card">
+            <div class="calendar-header" id="month-display">Mês Ano</div>
+            <div class="days-grid" id="calendar-grid"></div>
+        </div>
+        
+        <a href="Espaço do Aluno.html" class="btn-voltar"><i class="fas fa-arrow-left"></i> Voltar ao Painel</a>
+    </div>
+
+    <div class="modal" id="task-modal">
+        <div class="modal-content">
+            <h3 id="modal-date-title">Dia 01</h3>
+            <div id="task-list-display" class="task-list-display">
+                </div>
+            <button class="btn-close" onclick="closeModal()">Entendido</button>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAs3OTqOeVVzcxlrcM8Th5ObkhtXca69Ac",
+            authDomain: "mindspace-educacao.firebaseapp.com",
+            projectId: "mindspace-educacao",
+            storageBucket: "mindspace-educacao.firebasestorage.app",
+            messagingSenderId: "569394609531",
+            appId: "1:569394609531:web:9ab5ba6bc2181bc5a911de",
+            databaseURL: "https://mindspace-educacao-default-rtdb.firebaseio.com"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // Mapeamento das matérias e caminhos
+        const subjects = [
+            { name: 'Ciências', path: 'hadassa/acien', color: '#27ae60' },
+            { name: 'Artes', path: 'hadassa/aartes', color: '#e91e63' },
+            { name: 'Português', path: 'dl/apt', color: '#9b59b6' },
+            { name: 'Matemática', path: 'dl/amat', color: '#2980b9' }
+        ];
+
+        let consolidatedTasks = {}; 
+        const date = new Date();
+
+        function init() {
+            subjects.forEach(sub => {
+                onValue(ref(db, sub.path), (snapshot) => {
+                    const data = snapshot.val() || {};
+                    // Organiza dados por data: { "2024-1-15": [{subject: 'Artes', text: '...'}, {...}] }
+                    Object.keys(data).forEach(dayId => {
+                        if (!consolidatedTasks[dayId]) consolidatedTasks[dayId] = [];
+                        
+                        // Remove duplicatas se o Firebase disparar novamente
+                        consolidatedTasks[dayId] = consolidatedTasks[dayId].filter(t => t.subject !== sub.name);
+                        
+                        if(data[dayId] && data[dayId].trim() !== "") {
+                            consolidatedTasks[dayId].push({
+                                subject: sub.name,
+                                text: data[dayId],
+                                color: sub.color
+                            });
+                        }
+                    });
+                    renderCalendar();
+                });
+            });
+        }
+
+        function renderCalendar() {
+            const grid = document.getElementById('calendar-grid');
+            const monthDisplay = document.getElementById('month-display');
+            const monthNames = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+            
+            grid.innerHTML = '';
+            monthDisplay.innerText = `${monthNames[date.getMonth()]} ${date.getFullYear()}`;
+
+            const labels = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+            labels.forEach(l => grid.innerHTML += `<div class="day-label">${l}</div>`);
+
+            const firstDay = new Date(date.getFullYear(), date.getMonth(), 1).getDay();
+            const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
+
+            for (let i = 0; i < firstDay; i++) grid.innerHTML += `<div></div>`;
+
+            for (let i = 1; i <= lastDay; i++) {
+                const dayId = `${date.getFullYear()}-${date.getMonth() + 1}-${i}`;
+                const isToday = i === new Date().getDate() && date.getMonth() === new Date().getMonth();
+                const dayTasks = consolidatedTasks[dayId] || [];
+
+                const dayEl = document.createElement('div');
+                dayEl.className = `day ${isToday ? 'today' : ''}`;
+                dayEl.innerHTML = `<span>${i}</span>`;
+                
+                if (dayTasks.length > 0) {
+                    const dotsCont = document.createElement('div');
+                    dotsCont.className = 'task-dots';
+                    dayTasks.forEach(t => {
+                        dotsCont.innerHTML += `<div class="dot" style="background:${t.color}"></div>`;
+                    });
+                    dayEl.appendChild(dotsCont);
+                }
+
+                dayEl.onclick = () => openModal(i, dayId);
+                grid.appendChild(dayEl);
+            }
+        }
+
+        window.openModal = (num, id) => {
+            const tasks = consolidatedTasks[id] || [];
+            const display = document.getElementById('task-list-display');
+            document.getElementById('modal-date-title').innerText = `Tarefas de ${num}/${date.getMonth()+1}`;
+            
+            if (tasks.length === 0) {
+                display.innerHTML = '<p style="color:#999; text-align:center;">Nenhuma atividade para este dia.</p>';
+            } else {
+                display.innerHTML = tasks.map(t => `
+                    <div class="task-item" style="border-color: ${t.color}">
+                        <strong>${t.subject}</strong>
+                        <p>${t.text}</p>
+                    </div>
+                `).join('');
+            }
+            
+            document.getElementById('task-modal').style.display = 'flex';
+        };
+
+        window.closeModal = () => {
+            document.getElementById('task-modal').style.display = 'none';
+        };
+
+        init();
+    </script>
+</body>
+</html>
